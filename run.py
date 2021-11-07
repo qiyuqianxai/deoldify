@@ -52,7 +52,7 @@ if __name__ == '__main__':
             message = {}
             continue
         if message == last_msg:
-            print("wait...")
+            print("deoldify wait...")
             sleep(1)
             continue
         set_args(message)
