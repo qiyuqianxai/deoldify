@@ -28,9 +28,9 @@ res_img_dir = "/workspace/go_proj/src/Ai_WebServer/static/algorithm/colorImage/r
 
 def set_args(msg):
     args.input = msg['user_img']  # 输入的老照片
-    args.render_factor = 20 # 上色比例，越大越鲜艳（更占显存）
-    # args.artistic = True   # 是否采用artistic模式（相当于换模型，用0或1）
-    args.output = "deoldify_"+msg['user_img']
+    args.render_factor = msg["render_factor"] # 上色比例，越大越鲜艳（更占显存）
+    args.artistic = msg["artistic"]   # 是否采用artistic模式（相当于换模型，用0或1）
+    args.output = "deoldify_"+str(msg["render_factor"])+str(1 if msg["artistic"] else 0)+"_"+msg['user_img']
 
 
 if __name__ == '__main__':
@@ -40,7 +40,7 @@ if __name__ == '__main__':
     plt.style.use('dark_background')
     torch.backends.cudnn.benchmark = True
 
-    colorizer = get_image_colorizer(artistic=True)
+    colorizer = get_image_colorizer(artistic=False)
 
     while True:
         try:
@@ -55,14 +55,12 @@ if __name__ == '__main__':
             print("deoldify wait...")
             sleep(1)
             continue
+        else:
+            message_art = message['artistic']
+            change = message_art != args.artistic
+            if change:
+                colorizer = get_image_colorizer(artistic=args.artistic)
         set_args(message)
-        # else:
-        #     message_art = True if message['artistic'] == "1" else False
-        #     change = message_art != args.artistic
-        #     set_args(message)
-        #     if change:
-        #         colorizer = get_image_colorizer(artistic=args.artistic)
-
         image_file = os.path.join(user_img_dir, args.input)
         output_file = os.path.join(res_img_dir, args.output)
         if os.path.exists(output_file):
